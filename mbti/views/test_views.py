@@ -5,4 +5,4 @@ bp = Blueprint('test', __name__, url_prefix='/test')
 
 @bp.route('/question_1')
 def E_I_question():
-    return render_template('resume.html')
+    return render_template('test.html')

@@ -553,7 +553,7 @@ progress {
 }
 @media (min-width: 1200px) {
   .display-6 {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 }
 
@@ -7663,7 +7663,7 @@ textarea.form-control-lg {
 }
 
 .mb-4 {
-  margin-bottom: 1.5rem !important;
+  margin-bottom: 2rem !important;
 }
 
 .mb-5 {
@@ -7869,7 +7869,7 @@ textarea.form-control-lg {
 }
 
 .p-4 {
-  padding: 1.5rem !important;
+  padding: 2rem !important;
 }
 
 .p-5 {
