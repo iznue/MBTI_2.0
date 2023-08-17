@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, url_for
 from mbti.forms import Question_1_Form, Question_2_Form
 from werkzeug.utils import redirect
-
+from keras.preprocessing.sequence import pad_sequences
 from mbti import db
 from mbti.models import E_I_answer, S_N_answer
 
@@ -43,8 +43,22 @@ def S_N_predict():
     data_2 = request.form['comment_2']
     ## predict ##
     class_name=['N', 'S']
+    MAX_LEN = 87
+
     token_text = tokenizer_2.tokenize(data_2)
-    print(token_text)
+    input_ids = [[tokenizer_2.convert_tokens_to_ids(tokens) for tokens in token_text]]
+    input_ids = pad_sequences(input_ids, maxlen=MAX_LEN, dtype="long", truncating="post", padding="post")
+    input_ids = torch.tensor(input_ids)
+    
+    input_ids = input_ids.to(device)
+
+    with torch.no_grad():
+        output = model_2(input_ids)
+
+    output = output[0]
+    pred_2 = torch.argmax(output, 1)
+    
+    print(class_name[pred_2])
     print(Mbti_pred)
     Mbti_pred['S&N'] = data_2
     return render_template('test_3.html')
