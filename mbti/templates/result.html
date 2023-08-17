@@ -35,14 +35,14 @@
             <!-- Page Content-->
             <div class="container px-5 my-5">
                 <div class="text-center mb-5">
-                    <h1 class="display-5 fw-bolder mb-0"><span class="text-gradient d-inline">Q3.</span></h1>
+                    <h1 class="display-5 fw-bolder mb-0"><span class="text-gradient d-inline">Q1.</span></h1>
                 </div>
                 <div class="row gx-5 justify-content-center">
                     <div class="col-lg-11 col-xl-9 col-xxl-8">
                         <!-- Experience Section-->
                         <section>
                             <div class="text-center mb-4">
-                                <h2 class="fw-bolder mb-0"><span class="text-gradient d-inline">해당 영상을 시청해주세요 !</span></h2>
+                                <h2 class="fw-bolder mb-0"><span class="text-gradient d-inline">다음 질문에 대한 답변을 적어주세요 !</span></h2>
                                 <!-- Download resume button-->
                                 <!-- Note: Set the link href target to a PDF file within your project-->
                                 <!--<a class="btn btn-primary px-4 py-3" href="#!">
@@ -64,10 +64,10 @@
                                         </div>
                                         <!--<form id="contactForm" data-sb-form-api-token="API_TOKEN">-->
                                         <!---->    
-                                        <form action="{{ url_for('test.T_F_predict') }}" method="POST">    
+                                        <form action="{{ url_for('test.E_I_predict') }}" method="POST">    
                                             {# {{ form.csrf_token }}
                                             {{ form.content(class='form-control form-floating mb-3')}} #}
-                                            <input class="form-control form-floating mb-3 p-3" type="text" name="comment_2" placeholder="enter your comment">
+                                            <input class="form-control form-floating mb-3 p-3" type="text" name="comment_1" placeholder="enter your comment">
                                             <div class="text-center p-3"><input class="btn btn-outline-dark btn-lg px-5 me-sm-3 fs-6 fw-bolder" type="submit" value="Next"></div>
 
                                             <!--<div class="form-floating mb-3">

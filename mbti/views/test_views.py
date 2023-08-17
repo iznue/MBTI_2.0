@@ -14,7 +14,12 @@ bp = Blueprint('test', __name__, url_prefix='/test')
 
 Mbti_pred ={}
 
+# Model
+##########################################################################
+
 device = torch.device("cpu")
+
+# S & N 추론을 위한 model
 tokenizer_2 = BertTokenizer.from_pretrained("bert-base-multilingual-cased", do_lower_case=False)
 model_2 = BertForSequenceClassification.from_pretrained('bert-base-multilingual-cased')
 model_2.to(device)
@@ -41,7 +46,8 @@ def E_I_predict():
 @bp.route('/question_2', methods=['GET','POST'])
 def S_N_predict():
     data_2 = request.form['comment_2']
-    ## predict ##
+    
+    ########################## predict ##########################
     class_name=['N', 'S']
     MAX_LEN = 87
 
@@ -58,7 +64,22 @@ def S_N_predict():
     output = output[0]
     pred_2 = torch.argmax(output, 1)
     
-    print(class_name[pred_2])
+    predict_2 = class_name[pred_2]
+    Mbti_pred['S&N'] = predict_2
     print(Mbti_pred)
-    Mbti_pred['S&N'] = data_2
     return render_template('test_3.html')
+
+# T & F
+###########################################################################
+# T & F 추론 작업
+@bp.route('/question_3', methods=['GET','POST'])
+def T_F_predict():
+    return render_template('test_4.html')
+
+
+# P & J
+###########################################################################
+# P & J 추론 작업
+@bp.route('/question_4', methods=['GET','POST'])
+def P_J_predict():
+    return render_template('result.html')
