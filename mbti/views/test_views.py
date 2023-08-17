@@ -18,7 +18,8 @@ device = torch.device("cpu")
 tokenizer_2 = BertTokenizer.from_pretrained("bert-base-multilingual-cased", do_lower_case=False)
 model_2 = BertForSequenceClassification.from_pretrained('bert-base-multilingual-cased')
 model_2.to(device)
-model_2.load_state_dict(torch.load())
+model_2.load_state_dict(torch.load('best_model_0.7540_second_comment.pth'))
+model_2.eval()
 
 # E & I
 ##########################################################################
@@ -42,7 +43,8 @@ def S_N_predict():
     data_2 = request.form['comment_2']
     ## predict ##
     class_name=['N', 'S']
-    print(data_2)
+    token_text = tokenizer_2.tokenize(data_2)
+    print(token_text)
     print(Mbti_pred)
     Mbti_pred['S&N'] = data_2
     return render_template('test_3.html')
