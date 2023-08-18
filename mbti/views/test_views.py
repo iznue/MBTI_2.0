@@ -94,7 +94,7 @@ def E_I_question():
     return render_template('test.html')
 
 # E & I 추론 작업
-@bp.route('/question_1', methods=['GET','POST'])
+@bp.route('/question_2', methods=['GET','POST'])
 def E_I_predict():
     data_1 = request.form['comment_1'] # test.html의 form key 값을 받아옴
 
@@ -123,7 +123,7 @@ def E_I_predict():
 # S & N
 ###########################################################################
 # S & N 추론 작업
-@bp.route('/question_2', methods=['GET','POST'])
+@bp.route('/question_3', methods=['GET','POST'])
 def S_N_predict():
     data_2 = request.form['comment_2']
     
@@ -154,7 +154,7 @@ def S_N_predict():
 # T & F
 ###########################################################################
 # T & F 추론 작업
-@bp.route('/question_3', methods=['GET','POST'])
+@bp.route('/question_4', methods=['GET','POST'])
 def T_F_predict():
     session['T&F'] = 'T'
     return render_template('test_4.html')
@@ -163,7 +163,7 @@ def T_F_predict():
 # P & J
 ###########################################################################
 # P & J 추론 작업
-@bp.route('/question_4', methods=['GET','POST'])
+@bp.route('/result', methods=['GET','POST'])
 def P_J_predict():
     if request.method == 'POST':
         if 'file' not in request.files:
