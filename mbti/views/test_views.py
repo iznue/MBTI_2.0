@@ -7,11 +7,13 @@ from mbti.models import E_I_answer, S_N_answer
 from ultralytics import YOLO
 from PIL import Image
 import torch
-from pytorch_transformers import BertTokenizer, BertForSequenceClassification
+from pytorch_transformers import BertTokenizer, BertForSequenceClassification, BertConfig 
 import cv2
 import re
 import glob
 import os
+import numpy as np
+import torch.nn.functional as F
 
 # MBTI test 진행
 bp = Blueprint('test', __name__, url_prefix='/test') 
@@ -46,12 +48,36 @@ def get_latest_image_path_for_template():
 
     return url_path
 
+def pad_sequences_1(sequences, max_length, padding_value=0):
+    padded_sequences = np.full((len(sequences), max_length), padding_value, dtype=int)
+    for i, seq in enumerate(sequences):
+        padded_sequences[i,:len(seq)] = seq
+    return padded_sequences
 
+def encode_texts_1(tokenizer, texts, max_length=None):
+    encodings = []
+    masks = []
+
+    for text in texts:
+        encoded = tokenizer.encode(text, add_special_tokens=True)
+        encodings.append(encoded)
+
+    if max_length is None:
+        max_length = max(len(encoding) for encoding in encodings)
+    
+    encodings = pad_sequences_1(encodings, max_length)
+    masks = (encodings != 0) * 1
+
+    return encodings, masks
 
 # Models
 ##########################################################################
 
 device = torch.device("cpu")
+
+# E & I 추론을 위한 model
+# config = BertConfig.from_pretrained('bert-base-multilingual-cased')
+# model_1 = BertForSequenceClassification.from_pretrained('bert-base-multilingual-cased', config=config)
 
 # S & N 추론을 위한 model
 tokenizer_2 = BertTokenizer.from_pretrained("bert-base-multilingual-cased", do_lower_case=False)
@@ -71,8 +97,27 @@ def E_I_question():
 @bp.route('/question_1', methods=['GET','POST'])
 def E_I_predict():
     data_1 = request.form['comment_1'] # test.html의 form key 값을 받아옴
-    print(data_1)
-    session['E&I'] = 'E'
+
+    ########################## predict ##########################
+    class_name_1=['E', 'I']
+    
+    encoding, attention_mask = encode_texts_1(tokenizer_2, [data_1], 128)
+    input_ids = torch.tensor(encoding).to(device)
+    attention_mask = torch.tensor(attention_mask).to(device)
+
+    with torch.no_grad():
+        outputs = model_2(input_ids, attention_mask=attention_mask)
+        logits = outputs[0]        
+
+        # 소프트맥스 함수를 적용하여 확률 값 계산
+        # probabilities = F.softmax(logits, dim=1)
+        predicted = torch.argmax(logits, 1)
+
+    pred_1 = predicted.item()
+    predict_1 = class_name_1[pred_1]
+
+    session['E&I'] = predict_1
+    print(session)
     return render_template('test_2.html') # test_2.html에 추론 결과 전달
 
 # S & N
@@ -83,7 +128,7 @@ def S_N_predict():
     data_2 = request.form['comment_2']
     
     ########################## predict ##########################
-    class_name=['N', 'S']
+    class_name_2=['N', 'S']
     MAX_LEN = 87
 
     token_text = tokenizer_2.tokenize(data_2)
@@ -99,7 +144,7 @@ def S_N_predict():
     output = output[0]
     pred_2 = torch.argmax(output, 1)
     
-    predict_2 = class_name[pred_2]
+    predict_2 = class_name_2[pred_2]
 
     session['S&N'] = predict_2 # 추론 결과를 session에 value값으로 저장함
     # Mbti_pred['S&N'] = predict_2
