@@ -1,17 +1,52 @@
 from datetime import datetime
-from flask import Blueprint, render_template, request, url_for, session
+from flask import Blueprint, render_template, request, url_for, session, current_app, flash
 from mbti.forms import Question_1_Form, Question_2_Form
-from werkzeug.utils import redirect
+from werkzeug.utils import redirect, secure_filename
 from keras.preprocessing.sequence import pad_sequences
 from mbti.models import E_I_answer, S_N_answer
-
+from ultralytics import YOLO
+from PIL import Image
 import torch
 from pytorch_transformers import BertTokenizer, BertForSequenceClassification
+import cv2
+import re
+import glob
+import os
 
 # MBTI test 진행
 bp = Blueprint('test', __name__, url_prefix='/test') 
 
-# Mbti_pred ={}
+# basic func
+##########################################################################
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+# 파일 업로드를 저장할 폴더를 설정하세요
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+# 허용할 파일을 확인하는 함수
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def get_save_path():
+    return os.path.join(current_app.root_path, 'static', 'result_image')
+
+def get_latest_image_path_for_template():
+    save_path = get_save_path()
+    existing_results = glob.glob(os.path.join(save_path, 'results*.jpg'))
+    latest_image_path = max(existing_results, key=os.path.getmtime)
+
+    # 상대 경로로 변환
+    relative_path = os.path.relpath(latest_image_path, os.path.join(current_app.root_path, 'static'))
+
+    # URL 변환
+    url_path = relative_path.replace('\\', '/')
+
+    return url_path
+
+
 
 # Models
 ##########################################################################
@@ -85,6 +120,52 @@ def T_F_predict():
 # P & J 추론 작업
 @bp.route('/question_4', methods=['GET','POST'])
 def P_J_predict():
-    session['P&J'] = 'J'
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+
+        if file.filename == '':
+            flash('No file selected')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(file_path)
+
+            # Load the trained model
+            model = YOLO('best.pt')
+            # Perform object detection on the image
+            model_results = model.predict(source=file_path, show=False, save=True)
+
+            for r in model_results:
+                im_array = r.plot()
+                im = Image.fromarray(im_array[..., ::-1])
+                im.show()
+                save_path = get_save_path()
+                existing_results = glob.glob(os.path.join(save_path, 'results*.jpg'))
+                results_count = len(existing_results)
+
+                # Create a new file name with the next sequential number
+                new_file_name = f'results{results_count + 1}.jpg'
+
+                # Save the image with the new file name and the specified path
+                full_save_path = os.path.join(save_path, new_file_name)
+                im.save(full_save_path)
+
+            icons_count = len(model_results[0].boxes)
+
+            # Initialize object counter
+            if icons_count < 9 or icons_count == 0:
+                final_label = 'J'
+            elif icons_count >= 9:
+                final_label = 'P'
+
+            # Save icon count and final label result in the results list
+            results = [{'image_path': file_path, 'icons_count': icons_count, 'final_label': final_label}]
+
+            session['P&J'] = final_label
+
     return render_template('result.html')
     # result.html에서 session 값을 통해 사용자의 mbti 검사 결과를 출력함
