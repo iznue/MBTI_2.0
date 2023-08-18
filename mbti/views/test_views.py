@@ -156,7 +156,13 @@ def S_N_predict():
 # T & F 추론 작업
 @bp.route('/question_4', methods=['GET','POST'])
 def T_F_predict():
-    session['T&F'] = 'T'
+    # predict_3 = request.json
+    # print('receive data', predict_3)
+    
+    data_3 = request.get_json()
+    predict_3 = data_3.get("key")
+
+    session['T&F'] = predict_3
     return render_template('test_4.html')
 
 
