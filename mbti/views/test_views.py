@@ -88,13 +88,13 @@ model_2.eval()
 
 # E & I
 ##########################################################################
-@bp.route('/question_1')
+@bp.route('/question')
 def E_I_question():
     session.clear() # 웹브라우저 방문(사용자마다) session 초기화
     return render_template('test.html')
 
 # E & I 추론 작업
-@bp.route('/question_2', methods=['GET','POST'])
+@bp.route('/question_1', methods=['GET','POST'])
 def E_I_predict():
     data_1 = request.form['comment_1'] # test.html의 form key 값을 받아옴
 
@@ -123,7 +123,7 @@ def E_I_predict():
 # S & N
 ###########################################################################
 # S & N 추론 작업
-@bp.route('/question_3', methods=['GET','POST'])
+@bp.route('/question_2', methods=['GET','POST'])
 def S_N_predict():
     data_2 = request.form['comment_2']
     
@@ -148,21 +148,28 @@ def S_N_predict():
 
     session['S&N'] = predict_2 # 추론 결과를 session에 value값으로 저장함
     # Mbti_pred['S&N'] = predict_2
+
     print(session)
+
     return render_template('test_3.html')
 
 # T & F
 ###########################################################################
 # T & F 추론 작업
-@bp.route('/question_4', methods=['GET','POST'])
+@bp.route('/question_3', methods=['GET','POST'])
 def T_F_predict():
-    # predict_3 = request.json
-    # print('receive data', predict_3)
-    
-    data_3 = request.get_json()
-    predict_3 = data_3.get("key")
+    try:
+        predict_3 = request.json
+        print('receive data', predict_3)
+        session['T&F'] = predict_3
+        # print(session)
+    except:
+        pass
+    # data_3 = request.get_json()
+    # predict_3 = data_3.get("key")
 
-    session['T&F'] = predict_3
+    # session['T&F'] = predict_3
+    print(session)
     return render_template('test_4.html')
 
 

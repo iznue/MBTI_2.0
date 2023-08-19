@@ -6,3 +6,6 @@
 /build
 /dist
 /total.spec
+/ns.pkl
+/mediapipe_facemesh.csv
+/haarcascade_frontalface_default.xml

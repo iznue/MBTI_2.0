@@ -81,7 +81,7 @@ def landmark_csv(image, cap_time):
                 csv_writer.writerow(landmarks)
 
         else:
-            with open('mediapipe_facemesh.csv',mode='a',newline='') as f:
+            with open('mediapipe_facemesh.csv',mode='w',newline='') as f: # mode='a'에서 'w'로 변경함
                 csv_writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 csv_writer.writerow(face_row)
             f.close()      
@@ -98,7 +98,7 @@ mp_holistic = mp.solutions.holistic
 mp_holistic = mp.solutions.holistic
 cap = cv2.VideoCapture(0)
 
-video_length = 300
+video_length = 15
 frames = []
 start_time = cv2.getTickCount()  # 시작 시간
 
@@ -113,7 +113,6 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)    
         image.flags.writeable = False  # 영상에서 캡처한 이미지 변하지 않도록 w1. writable = False, w2. copy()
-
 
         if n == cycle:      
             try:
@@ -167,11 +166,14 @@ try:
 except:
     pass
 
-url = 'http://192.168.0.232:320/test/question_4'
-headers = {'Content-Type': 'application/json'}
-data = {'key':pred}
-response = requests.post(url, data=json.dumps(data), headers=headers, timeout= 10)  # POST 요청 보내기
+url = 'http://192.168.35.145:5556/test/question_3' # 포트번호 : 5555, 5556으로 변경해보기
+# headers = {'Content-Type': 'application/json'}
+# data = {'key':pred}
+# response = requests.post(url, data=json.dumps(data), headers=headers, timeout= 10)  # POST 요청 보내기
+
 # response = requests.post(url, json= pred, headers=headers, timeout= 10)
+
+response = requests.post(url, json=pred, timeout= 10)
 # except:
 #     time.sleep(10)
 #     response = requests.post(url, pred)
