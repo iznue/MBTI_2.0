@@ -207,7 +207,7 @@ def T_F_predict():
     
     ################ t&f 얼굴 이미지 분류
     class_names = ['T', 'F']
-    
+    session['T&F'] = 'F' # 사용자가 이미지를 넣지 않는 경우를 대비해 임의적으로 SESSION 값을 지정함
     if request.method == 'POST':
         if 'file' not in request.files:
             flash('No file part')
@@ -238,6 +238,7 @@ def T_F_predict():
 # P & J 추론 작업
 @bp.route('/result', methods=['GET','POST'])
 def P_J_predict():
+    session['P&J'] = 'J' # 사용자가 이미지를 넣지 않는 경우를 대비해 임의적으로 SESSION 값을 지정함
     if request.method == 'POST':
         if 'file' not in request.files:
             flash('No file part')
@@ -285,5 +286,7 @@ def P_J_predict():
 
             session['P&J'] = final_label
 
-    return render_template('result.html')
+    mbti_type = session['E&I'] + session['S&N'] + session['T&F'] + session['P&J']  
+    image_path = "/static/assets/" + mbti_type.lower() + ".png"        
+    return render_template('result.html', mbti_type=mbti_type, image_path=image_path)
     # result.html에서 session 값을 통해 사용자의 mbti 검사 결과를 출력함
