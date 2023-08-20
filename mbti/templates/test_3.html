@@ -42,7 +42,7 @@
                         <!-- Experience Section-->
                         <section>
                             <div class="text-center mb-4">
-                                <h2 class="fw-bolder mb-0"><span class="text-gradient d-inline">해당 영상을 시청해주세요 !</span></h2>
+                                <h2 class="fw-bolder mb-0"><span class="text-gradient d-inline">증명사진과 같이 정면을 보고있는 <br>얼굴 사진을 업로드해 주세요 !<!--해당 영상을 시청해주세요 !--></span></h2>
                                 <!-- Download resume button-->
                                 <!-- Note: Set the link href target to a PDF file within your project-->
                                 <!--<a class="btn btn-primary px-4 py-3" href="#!">
@@ -52,16 +52,21 @@
                             </div>
                             <!-- Experience Card 1-->
                             <div class="card shadow border-0 rounded-4 mb-3">
-                                <div class="card-body p-4">
+                                <div class="card-body">
                                     <div class="row align-items-center gx-5">
                                         <div class="text-center mb-4">
+                                            <!-- t&f 감정 분류 시 사용할 코드
                                             <iframe width="660" height="330" src="https://www.youtube.com/embed/QW6rFnOQnUY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                                             <a href="total://">테스트 시작</a>
+                                            -->
+                                            <img src="/static/assets/upload_person_image.png" width="150" height="150" alt="..." />
+                                            <h1 class="text-center h6">최종 학습된 AI 모델을 사용하므로 사진을 절대 저장되지 않습니다.</h1>
                                         </div>
                                         <!--<form id="contactForm" data-sb-form-api-token="API_TOKEN">-->
                                         <!---->    
-                                        <form action="{{ url_for('test.T_F_predict') }}" method="POST">    
-                                            <div class="text-center"><input class="btn btn-outline-dark btn-lg px-5 me-sm-3 fs-6 fw-bolder" type="submit" value="Next"></div>
+                                        <form action="{{ url_for('test.T_F_predict') }}" method="POST" enctype="multipart/form-data">    
+                                            <input class="form-control form-floating" type="file" name="file">
+                                            <div class="text-center p-3"><input class="btn btn-outline-dark btn-lg px-5 me-sm-3 fs-6 fw-bolder" type="submit" value="Next"></div>
 
                                             <!--<div class="form-floating mb-3">
                                                 <input class="form-control" id="comment" type="text" placeholder="Enter your comment..." data-sb-validations="required" />

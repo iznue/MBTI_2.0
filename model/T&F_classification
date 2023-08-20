@@ -1,0 +1,56 @@
+from keras.models import load_model
+from PIL import Image, ImageOps
+import numpy as np
+import mediapipe as mp
+import cv2
+
+# Load the model
+model = load_model("keras_Model.h5", compile=False)
+
+# Load the labels
+class_names = ['T', 'F']
+
+# Create the array of the right shape to feed into the keras model
+data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+
+# Replace this with the path to your image
+image_path = "test_img.jpg"
+
+# Load the image
+image = Image.open(image_path).convert("RGB")
+
+# MediaPipe 얼굴 인식 모듈 초기화
+mp_face_detection = mp.solutions.face_detection
+face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.5)
+
+# Convert PIL image to OpenCV image (numpy array)
+image_cv = np.array(image)
+image_cv = cv2.cvtColor(image_cv, cv2.COLOR_RGB2BGR)
+
+# Detect faces using MediaPipe
+results = face_detection.process(image_cv)
+if results.detections:
+    for detection in results.detections:
+        bboxC = detection.location_data.relative_bounding_box
+        ih, iw, _ = image_cv.shape
+        x, y, w, h = int(bboxC.xmin * iw), int(bboxC.ymin * ih), int(bboxC.width * iw), int(bboxC.height * ih)
+        cropped_face = image_cv[y:y+h, x:x+w]
+        
+        # Resize the cropped face to 224x224
+        resized_face = cv2.resize(cropped_face, (224, 224))
+        
+        # Normalize the image
+        normalized_image_array = (resized_face.astype(np.float32) / 127.5) - 1
+        
+        # Load the normalized image into the array
+        data[0] = normalized_image_array
+        
+        # Predict the model
+        prediction = model.predict(data)
+        index = np.argmax(prediction)
+        class_name = class_names[index]
+        confidence_score = prediction[0][index]
+        
+        # Print prediction and confidence score for this face
+        print("Face Class:", class_name)
+        print("Confidence Score:", confidence_score)

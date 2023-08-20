@@ -2,6 +2,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, url_for, session, current_app, flash
 from mbti.forms import Question_1_Form, Question_2_Form
 from werkzeug.utils import redirect, secure_filename
+from keras.models import load_model
 from keras.preprocessing.sequence import pad_sequences
 from mbti.models import E_I_answer, S_N_answer
 from ultralytics import YOLO
@@ -14,6 +15,7 @@ import glob
 import os
 import numpy as np
 import torch.nn.functional as F
+import mediapipe as mp
 
 # MBTI test 진행
 bp = Blueprint('test', __name__, url_prefix='/test') 
@@ -70,6 +72,38 @@ def encode_texts_1(tokenizer, texts, max_length=None):
 
     return encodings, masks
 
+def detect_face(image_path):
+    data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+    # MediaPipe 얼굴 인식 모듈 초기화
+    mp_face_detection = mp.solutions.face_detection
+    face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.5)
+
+    # OpenCV를 사용하여 이미지 읽기
+    image = Image.open(image_path).convert("RGB")
+    image_cv = np.array(image)
+    image_cv = cv2.cvtColor(image_cv, cv2.COLOR_RGB2BGR)
+
+    # 얼굴 검출 실행
+    results = face_detection.process(image_cv)
+
+    if results.detections:
+        for detection in results.detections:
+            bboxC = detection.location_data.relative_bounding_box
+            ih, iw, _ = image_cv.shape
+            x, y, w, h = int(bboxC.xmin * iw), int(bboxC.ymin * ih), int(bboxC.width * iw), int(bboxC.height * ih)
+            cropped_face = image_cv[y:y+h, x:x+w]
+            
+            # Resize the cropped face to 224x224
+            resized_face = cv2.resize(cropped_face, (224, 224))
+            
+            # Normalize the image
+            normalized_image_array = (resized_face.astype(np.float32) / 127.5) - 1
+            
+            # Load the normalized image into the array
+            data[0] = normalized_image_array
+        
+    return data
+
 # Models
 ##########################################################################
 
@@ -85,6 +119,9 @@ model_2 = BertForSequenceClassification.from_pretrained('bert-base-multilingual-
 model_2.to(device)
 model_2.load_state_dict(torch.load('best_model_0.7540_second_comment.pth'))
 model_2.eval()
+
+# T & F 추론을 위한 model
+model_3 = load_model("keras_Model.h5", compile=False)
 
 # E & I
 ##########################################################################
@@ -158,18 +195,41 @@ def S_N_predict():
 # T & F 추론 작업
 @bp.route('/question_3', methods=['GET','POST'])
 def T_F_predict():
-    try:
-        predict_3 = request.json
-        print('receive data', predict_3)
-        session['T&F'] = predict_3
-        # print(session)
-    except:
-        pass
-    # data_3 = request.get_json()
-    # predict_3 = data_3.get("key")
+    ################ t&f 웹캠을 이용한 감정 분류
+    # try:
+    #     print(session)
+    #     predict_3 = request.json
+    #     print('receive data', predict_3)
+    #     session['T&F'] = predict_3
+    #     print(session)
+    # except:
+    #     pass
+    
+    ################ t&f 얼굴 이미지 분류
+    class_names = ['T', 'F']
+    
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
 
-    # session['T&F'] = predict_3
-    print(session)
+        if file.filename == '':
+            flash('No file selected')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(file_path) 
+
+            # 얼굴 검출된 이미지 얻기
+            data = detect_face(file_path)
+
+            prediction = model_3.predict(data)
+            index = np.argmax(prediction)
+            class_name = class_names[index]
+            print("Face Class:", class_name)
+            session['T&F'] = class_name
     return render_template('test_4.html')
 
 

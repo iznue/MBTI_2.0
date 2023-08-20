@@ -9,3 +9,4 @@
 /ns.pkl
 /mediapipe_facemesh.csv
 /haarcascade_frontalface_default.xml
+/keras_model.h5

@@ -157,7 +157,8 @@ try:
     else:
         pred = 'F'
 
-    
+    url = 'http://192.168.35.145:5556/test/question_3'
+    response = requests.post(url, json=pred, timeout= 10)
 
     # yhat = model.predict(X)[0]  #0,1
     # yhat = cname[yhat]
@@ -166,14 +167,9 @@ try:
 except:
     pass
 
-url = 'http://192.168.35.145:5556/test/question_3' # 포트번호 : 5555, 5556으로 변경해보기
-# headers = {'Content-Type': 'application/json'}
-# data = {'key':pred}
-# response = requests.post(url, data=json.dumps(data), headers=headers, timeout= 10)  # POST 요청 보내기
+# url = 'http://192.168.35.145:5556/test/question_3' # 포트번호 : 5555, 5556으로 변경해보기
+# response = requests.post(url, json=pred, timeout= 10)
 
-# response = requests.post(url, json= pred, headers=headers, timeout= 10)
-
-response = requests.post(url, json=pred, timeout= 10)
 # except:
 #     time.sleep(10)
 #     response = requests.post(url, pred)
