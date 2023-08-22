@@ -81,7 +81,7 @@ def landmark_csv(image, cap_time):
                 csv_writer.writerow(landmarks)
 
         else:
-            with open('mediapipe_facemesh.csv',mode='w',newline='') as f: # mode='a'에서 'w'로 변경함
+            with open('mediapipe_facemesh.csv',mode='a',newline='') as f: # mode='a'에서 'w'로 변경함
                 csv_writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 csv_writer.writerow(face_row)
             f.close()      

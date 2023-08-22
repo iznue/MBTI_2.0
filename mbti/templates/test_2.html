@@ -64,18 +64,18 @@
                                             </div>
                                         </div>
                                         <!--<form id="contactForm" data-sb-form-api-token="API_TOKEN">-->
-                                        <!---->    
+                                        <!-- 음성 입력 버튼 -->   
+                                        <form action="{{ url_for('test.question_2_audio') }}" method="POST">    
+                                            <div class="text-center p-3"><input class="btn btn-outline-dark btn-lg px-5 me-sm-3 fs-6 fw-bolder" type="submit" value="음성 입력 시작"></div>
+                                        </form>                                
+                                        <!-- 텍스트 추론 -->
                                         <form action="{{ url_for('test.S_N_predict') }}" method="POST">    
                                             {# {{ form.csrf_token }}
                                             {{ form.content(class='form-control form-floating mb-3')}} #}
+                                            <!--<div class="text-center p-3"><button type="button" class="btn btn-primary px-4 py-3" id="startRecordingBtn">음성 입력 시작</button></div>-->
+                                            
                                             <input class="form-control form-floating mb-3 p-3" type="text" name="comment_2" placeholder="enter your comment">
                                             <div class="text-center p-3"><input class="btn btn-outline-dark btn-lg px-5 me-sm-3 fs-6 fw-bolder" type="submit" value="Next"></div>
-
-                                            <!--<div class="form-floating mb-3">
-                                                <input class="form-control" id="comment" type="text" placeholder="Enter your comment..." data-sb-validations="required" />
-                                                <label for="comment">your comment</label>
-                                                <div class="invalid-feedback" data-sb-feedback="comment:required">A comment is required.</div>
-                                            </div>-->
                                         </form>
                                         <!--<div class="col-lg-8"><div>Lorem ipsum dolor sit amet consectetur adipisicing elit.</div></div>-->
                                     </div>
@@ -107,5 +107,41 @@
         <script src="/static/js/scripts.js"></script>
 
         <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+
+        <!--------------------------음성 입력 받기------------------------>
+        <!--
+        <script>
+            document.getElementById('startRecordingBtn').addEventListener('click', function() {
+                navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+                    const mediaRecorder = new MediaRecorder(stream);
+                    const chunks = [];
+            
+                    mediaRecorder.ondataavailable = function(e) {
+                        chunks.push(e.data);
+                    };
+            
+                    mediaRecorder.onstop = function() {
+                        const blob = new Blob(chunks, { type: 'audio/wav' });
+                        const formData = new FormData();
+                        formData.append('audio', blob);
+            
+                        fetch('/question_2_audio', {
+                            method: 'POST',
+                            body: formData
+                        }).then(function(response) {
+                            return response.json();
+                        }).then(function(data) {
+                            document.getElementById('transcription').value = data.transcription;
+                        });
+                    };
+            
+                    mediaRecorder.start();
+                    setTimeout(function() {
+                        mediaRecorder.stop();
+                    }, 5000); // 5초간 녹음 후 멈춤
+                });
+            });
+        </script>
+        -->
     </body>
 </html>

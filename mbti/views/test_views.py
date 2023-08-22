@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Blueprint, render_template, request, url_for, session, current_app, flash
+from flask import Blueprint, render_template, request, url_for, session, current_app, flash, jsonify
 from mbti.forms import Question_1_Form, Question_2_Form
 from werkzeug.utils import redirect, secure_filename
 from keras.models import load_model
@@ -13,9 +13,13 @@ import cv2
 import re
 import glob
 import os
+import time
 import numpy as np
 import torch.nn.functional as F
 import mediapipe as mp
+import speech_recognition as sr
+from gtts import gTTS
+from playsound import playsound
 
 # MBTI test 진행
 bp = Blueprint('test', __name__, url_prefix='/test') 
@@ -159,11 +163,46 @@ def E_I_predict():
 
 # S & N
 ###########################################################################
+# S & N 음성 입력 받기
+@bp.route('/question_2_audio', methods=['GET','POST'])
+def question_2_audio():
+    print('ok')
+    # path = 'C:/Users/user/Desktop/MBTI_2.0/audio_fail.mp3'
+    
+    r = sr.Recognizer()
+    try:
+        while True:
+            print('yes')
+            with sr.Microphone() as source:
+                audio = r.listen(source, timeout=5)  # 5초 타임아웃 설정
+                answer = r.recognize_google(audio, language='ko-KR')
+                print(answer)
+                session['answer'] = answer
+                break
+    except:
+        transcription = "음성을 인식하지 못했습니다. 다시 입력해주세요"
+
+        # GTTS를 사용하여 음성 인식 실패 메시지를 MP3 파일로 생성
+        # tts = gTTS(transcription, lang='ko')
+        # tts.save('audio_fail.mp3')
+
+        # 생성된 MP3 파일 재생
+        playsound('C:/Users/user/Desktop/MBTI_2.0/audio_fail.mp3')
+
+        answer = transcription  # 실패 메시지를 answer로 저장
+        print(answer)
+
+    return render_template('test_2.html')
+
+
 # S & N 추론 작업
 @bp.route('/question_2', methods=['GET','POST'])
 def S_N_predict():
-    data_2 = request.form['comment_2']
+    print(session)
+    data_2 = session['answer']
     
+    # 핸드폰의 경우 답변 입력을 받으므로 'comment_2 값 사용
+    # data_2 = request.form['comment_2']
     ########################## predict ##########################
     class_name_2=['N', 'S']
     MAX_LEN = 87
@@ -230,6 +269,7 @@ def T_F_predict():
             class_name = class_names[index]
             print("Face Class:", class_name)
             session['T&F'] = class_name
+            print(session)
     return render_template('test_4.html')
 
 
@@ -261,7 +301,7 @@ def P_J_predict():
             for r in model_results:
                 im_array = r.plot()
                 im = Image.fromarray(im_array[..., ::-1])
-                im.show()
+                # im.show()
                 save_path = get_save_path()
                 existing_results = glob.glob(os.path.join(save_path, 'results*.jpg'))
                 results_count = len(existing_results)
