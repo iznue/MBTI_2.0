@@ -51,7 +51,7 @@
                                         <div class="text-center mb-4">
 <!--                                             t&f 감정 분류 시 사용할 코드-->
                                             <iframe width="660" height="330" src="https://www.youtube.com/embed/QW6rFnOQnUY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                                            <a href="total://">테스트 시작</a>
+                                            <div class="text-center"><a href="total://">테스트 시작</a></div>
 <!--                                            <button type="button" onclick="location.href='{{ url_for('test.P_J_predict')}}'">테스트 시작</button>-->
 
                                             <!--<img src="/static/assets/upload_person_image.png" width="150" height="150" alt="..." />
@@ -60,7 +60,6 @@
                                         <!--<form id="contactForm" data-sb-form-api-token="API_TOKEN">-->
                                         <!---->
                                         <form action="{{ url_for('test.get_device_PC2') }}" method="POST" enctype="multipart/form-data">
-                                            <input class="form-control form-floating" type="file" name="file">
                                             <div class="text-center p-3"><input class="btn btn-outline-dark btn-lg px-5 me-sm-3 fs-6 fw-bolder" type="submit" value="Next"></div>
 
                                             <!--<div class="form-floating mb-3">
