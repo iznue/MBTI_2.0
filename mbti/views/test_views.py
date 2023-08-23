@@ -158,6 +158,8 @@ def E_I_predict():
     predict_1 = class_name_1[pred_1]
 
     session['E&I'] = predict_1
+    session['answer'] = ''
+    
     print(session)
     return render_template('test_2.html') # test_2.html에 추론 결과 전달
 
@@ -168,7 +170,6 @@ def E_I_predict():
 def question_2_audio():
     print('ok')
     # path = 'C:/Users/user/Desktop/MBTI_2.0/audio_fail.mp3'
-    
     r = sr.Recognizer()
     try:
         while True:
@@ -228,39 +229,79 @@ def S_N_predict():
 
     print(session)
 
-    return render_template('test_3.html')
+    return render_template('Classification.html')
+
+@bp.route('/get_device_Mobile', methods=['GET', 'POST'])
+def get_device_Mobile():
+
+    return render_template('Mobile.html')
+
+
+@bp.route('/get_device_PC', methods=['GET', 'POST'])
+def get_device_PC():
+
+    return render_template('PC.html')
 
 # T & F
 ###########################################################################
 # T & F 추론 작업
-@bp.route('/question_3', methods=['GET','POST'])
-def T_F_predict():
-    ################ t&f 웹캠을 이용한 감정 분류
-    # try:
-    #     print(session)
-    #     predict_3 = request.json
-    #     print('receive data', predict_3)
-    #     session['T&F'] = predict_3
-    #     print(session)
-    # except:
-    #     pass
+# @bp.route('/question_3', methods=['GET','POST'])
+# def T_F_predict():
+#     ################ t&f 웹캠을 이용한 감정 분류
+#     # try:
+#     #     print(session)
+#     #     predict_3 = request.json
+#     #     print('receive data', predict_3)
+#     #     session['T&F'] = predict_3
+#     #     print(session)
+#     # except:
+#     #     pass
     
-    ################ t&f 얼굴 이미지 분류
+#     ################ t&f 얼굴 이미지 분류
+#     class_names = ['T', 'F']
+#     session['T&F'] = 'F' # 사용자가 이미지를 넣지 않는 경우를 대비해 임의적으로 SESSION 값을 지정함
+#     if request.method == 'POST':
+#         if 'file' not in request.files:
+#             flash('No file part')
+#             return redirect(request.url)
+#         file = request.files['file']
+
+#         if file.filename == '':
+#             flash('No file selected')
+#             return redirect(request.url)
+#         if file and allowed_file(file.filename):
+#             filename = secure_filename(file.filename)
+#             file_path = os.path.join(UPLOAD_FOLDER, filename)
+#             file.save(file_path) 
+
+#             # 얼굴 검출된 이미지 얻기
+#             data = detect_face(file_path)
+
+#             prediction = model_3.predict(data)
+#             index = np.argmax(prediction)
+#             class_name = class_names[index]
+#             print("Face Class:", class_name)
+#             session['T&F'] = class_name
+#             print(session)
+#     return render_template('test_4.html')
+
+
+@bp.route('/get_device_Mobile2', methods=['GET', 'POST'])
+def get_device_Mobile2():
     class_names = ['T', 'F']
-    session['T&F'] = 'F' # 사용자가 이미지를 넣지 않는 경우를 대비해 임의적으로 SESSION 값을 지정함
+    session['T&F'] = 'F'  # 사용자가 이미지를 넣지 않는 경우를 대비해 임의적으로 SESSION 값을 지정함
     if request.method == 'POST':
         if 'file' not in request.files:
             flash('No file part')
             return redirect(request.url)
         file = request.files['file']
-
         if file.filename == '':
             flash('No file selected')
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file_path = os.path.join(UPLOAD_FOLDER, filename)
-            file.save(file_path) 
+            file.save(file_path)
 
             # 얼굴 검출된 이미지 얻기
             data = detect_face(file_path)
@@ -270,9 +311,21 @@ def T_F_predict():
             class_name = class_names[index]
             print("Face Class:", class_name)
             session['T&F'] = class_name
-            print(session)
     return render_template('test_4.html')
 
+
+@bp.route('/get_device_PC2', methods=['GET', 'POST'])
+def get_device_PC2():
+    session['T&F'] = 'F'    # 사용자가 이미지를 넣지 않는 경우를 대비해 임의적으로 SESSION 값을 지정함
+    try:
+        print(session)
+        predict_3 = request.json
+        print('receive data', predict_3)
+        session['T&F'] = predict_3
+        print(session)
+    except:
+        pass
+    return render_template('test_4.html')
 
 # P & J
 ###########################################################################

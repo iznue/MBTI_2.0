@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MBTI2.0</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+        $(document).ready(function() {
+            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            console.log(isMobile);
+
+            if (isMobile) {
+                window.location.href = 'http://192.168.0.63:5556/test/get_device_Mobile';
+            } else {
+                window.location.href = 'http://192.168.0.63:5556/test/get_device_PC';
+            }
+        });
+    </script>
+
+</head>
+<body>
+
+</body>
+</html>
