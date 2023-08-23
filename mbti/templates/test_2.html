@@ -72,9 +72,9 @@
                                         <form action="{{ url_for('test.S_N_predict') }}" method="POST">    
                                             {# {{ form.csrf_token }}
                                             {{ form.content(class='form-control form-floating mb-3')}} #}
-                                            <!--<div class="text-center p-3"><button type="button" class="btn btn-primary px-4 py-3" id="startRecordingBtn">음성 입력 시작</button></div>-->
-                                            
-                                            <input class="form-control form-floating mb-3 p-3" type="text" name="comment_2" placeholder="enter your comment">
+                                            <!--<input class="form-control form-floating mb-3 p-3" type="text" name="comment_2" placeholder="enter your comment">-->
+
+                                            <div class="form-control form-floating mb-3 p-3"><p>{{ session['answer'] }}</p></div>
                                             <div class="text-center p-3"><input class="btn btn-outline-dark btn-lg px-5 me-sm-3 fs-6 fw-bolder" type="submit" value="Next"></div>
                                         </form>
                                         <!--<div class="col-lg-8"><div>Lorem ipsum dolor sit amet consectetur adipisicing elit.</div></div>-->

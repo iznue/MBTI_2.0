@@ -174,6 +174,7 @@ def question_2_audio():
         while True:
             print('yes')
             with sr.Microphone() as source:
+                print('마이크 시작')
                 audio = r.listen(source, timeout=5)  # 5초 타임아웃 설정
                 answer = r.recognize_google(audio, language='ko-KR')
                 print(answer)
