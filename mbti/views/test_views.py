@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Blueprint, render_template, request, url_for, session, current_app, flash, jsonify
 from werkzeug.utils import redirect, secure_filename
 from keras.models import load_model
@@ -23,6 +24,8 @@ from playsound import playsound
 
 # MBTI test 진행
 bp = Blueprint('test', __name__, url_prefix='/test') 
+
+USER_ID = 0
 
 # basic func
 ##########################################################################
@@ -127,7 +130,7 @@ model_2.eval()
 # T & F 추론을 위한 model
 model_3 = load_model("keras_Model.h5", compile=False)
 
-################################################################################################################################################################################
+
 # E & I
 ##########################################################################
 @bp.route('/question')
@@ -160,9 +163,13 @@ def E_I_predict():
 
     session['E&I'] = predict_1
     session['answer'] = ''
-    q1 = MBTI_result(ei = predict_1)
+
+    q1 = MBTI_result(ei=session['E&I'], create_date=datetime.now())
     db.session.add(q1)
     db.session.commit()
+    USER_ID = q1.id
+    session['USER_ID'] = USER_ID
+    print(USER_ID)
     
     print(session)
     return render_template('test_2.html') # test_2.html에 추론 결과 전달
@@ -204,7 +211,6 @@ def question_2_audio():
 # S & N 추론 작업
 @bp.route('/question_2', methods=['GET','POST'])
 def S_N_predict():
-    print(session)
     data_2 = session['answer']
     
     # 핸드폰의 경우 답변 입력을 받으므로 'comment_2 값 사용
@@ -230,6 +236,11 @@ def S_N_predict():
 
     session['S&N'] = predict_2 # 추론 결과를 session에 value값으로 저장함
     # Mbti_pred['S&N'] = predict_2
+
+    q2 = MBTI_result.query.filter_by(id=session['USER_ID']).first()
+    # q2 = MBTI_result.query.filter(MBTI_result.id==session['USER_ID']).all()
+    q2.sn = session['S&N']
+    db.session.commit()
 
     print(session)
 
@@ -315,20 +326,32 @@ def get_device_Mobile2():
             class_name = class_names[index]
             print("Face Class:", class_name)
             session['T&F'] = class_name
+
+    q3 = MBTI_result.query.filter_by(id=session['USER_ID']).first()
+    q3.tf = session['T&F']
+    db.session.commit()            
+    
     return render_template('test_4.html')
 
 
 @bp.route('/get_device_PC2', methods=['GET', 'POST'])
 def get_device_PC2():
     session['T&F'] = 'F'    # 사용자가 이미지를 넣지 않는 경우를 대비해 임의적으로 SESSION 값을 지정함
+    predict_3 = session['T&F']
+    # print(session['USER_ID'])
+    
     try:
-        print(session)
         predict_3 = request.json
         print('receive data', predict_3)
-        session['T&F'] = predict_3
-        print(session)
+        # session['T&F'] = predict_3
+
     except:
         pass
+
+    # q3 = MBTI_result.query.filter_by(id=USER_ID).first()
+    q3 = MBTI_result.query.filter(MBTI_result.id==USER_ID).first()
+    q3.tf = predict_3
+    db.session.commit()
     return render_template('test_4.html')
 
 # P & J
@@ -383,6 +406,18 @@ def P_J_predict():
             results = [{'image_path': file_path, 'icons_count': icons_count, 'final_label': final_label}]
 
             session['P&J'] = final_label
+
+    q4 = MBTI_result.query.filter_by(id=session['USER_ID']).first()
+    q4.jp = session['P&J']
+    db.session.commit()            
+
+
+    result = MBTI_result.query.filter_by(id=session['USER_ID']).first()
+    session['E&I'] = result.ei
+    session['S&N'] = result.sn
+    session['T&F'] = result.tf
+    session['P&J'] = result.jp
+    print('final session : ', session)
 
     mbti_type = session['E&I'] + session['S&N'] + session['T&F'] + session['P&J']  
     image_path = "/static/assets/" + mbti_type.lower() + ".png"        
