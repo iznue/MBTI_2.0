@@ -12,6 +12,7 @@ def create_app():
     app.config.from_object(config)
     app.secret_key = 'mbti_2.0' # session 사용을 위한 키 설정
 
+    # ORM
     db.init_app(app)
     migrate.init_app(app, db)
 
