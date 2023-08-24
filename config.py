@@ -2,7 +2,7 @@ import os
 
 BASE_DIR = os.path.dirname(__file__)
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(os.path.join(BASE_DIR, 'mbti.db'))
+SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(os.path.join(BASE_DIR, 'mbti_result.db'))
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 

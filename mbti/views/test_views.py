@@ -1,12 +1,12 @@
-from datetime import datetime
 from flask import Blueprint, render_template, request, url_for, session, current_app, flash, jsonify
-from mbti.forms import Question_1_Form, Question_2_Form
 from werkzeug.utils import redirect, secure_filename
 from keras.models import load_model
 from keras.preprocessing.sequence import pad_sequences
-from mbti.models import E_I_answer, S_N_answer
 from ultralytics import YOLO
 from PIL import Image
+from mbti import db
+from mbti.models import MBTI_result
+from datetime import datetime
 import torch
 from pytorch_transformers import BertTokenizer, BertForSequenceClassification, BertConfig 
 import cv2
@@ -127,6 +127,7 @@ model_2.eval()
 # T & F 추론을 위한 model
 model_3 = load_model("keras_Model.h5", compile=False)
 
+################################################################################################################################################################################
 # E & I
 ##########################################################################
 @bp.route('/question')
@@ -159,6 +160,9 @@ def E_I_predict():
 
     session['E&I'] = predict_1
     session['answer'] = ''
+    q1 = MBTI_result(ei = predict_1)
+    db.session.add(q1)
+    db.session.commit()
     
     print(session)
     return render_template('test_2.html') # test_2.html에 추론 결과 전달
