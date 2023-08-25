@@ -195,8 +195,6 @@ try:
     else:
         pred = 'T'
 
-    
-
     # yhat = model.predict(X)[0]  #0,1
     # yhat = cname[yhat]
     # print(yhat)\
@@ -211,7 +209,7 @@ url = 'http://192.168.0.232:5556/test/get_device_PC2' # 포트번호 : 5555, 555
 
 # response = requests.post(url, json= pred, headers=headers, timeout= 10)
 
-data = {'predict':pred, 'user_id':40}
+data = {'predict':pred, 'user_id':3}
 response = requests.post(url, json=data, timeout= 10)
 # except:
 #     time.sleep(10)
@@ -221,7 +219,6 @@ response = requests.post(url, json=data, timeout= 10)
 # os.remove(os.path.join(DATA_PATH,'mediapipe_facemesh.csv'))
 
 sys.exit()
-
 
 ############# cmd 창 안닫히게 ###################################################
 input()

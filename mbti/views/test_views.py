@@ -31,7 +31,7 @@ USER_ID = 0
 ##########################################################################
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
-# 파일 업로드를 저장할 폴더를 설정하세요
+# 파일 업로드를 저장할 폴더를 설정
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
 
 if not os.path.exists(UPLOAD_FOLDER):
@@ -113,7 +113,6 @@ def detect_face(image_path):
 
 # Models
 ##########################################################################
-
 device = torch.device("cpu")
 
 # E & I 추론을 위한 model
@@ -218,14 +217,11 @@ def question_2_audio():
 
     return render_template('PC_test_2.html')
 
-
-# S & N 추론 작업
 # S & N 추론 작업
 @bp.route('/question_2_PC', methods=['GET', 'POST'])
 def question_2_PC():
     print(session)
     data_2 = session['answer']
-
 
     # 핸드폰의 경우 답변 입력을 받으므로 'comment_2 값 사용
     # data_2 = request.form['comment_2']
@@ -296,45 +292,6 @@ def question_2_Mobile():
 
     return render_template('Classification.html')
 
-
-# @bp.route('/question_2', methods=['GET','POST'])
-# def S_N_predict():
-#     data_2 = session['answer']
-    
-#     # 핸드폰의 경우 답변 입력을 받으므로 'comment_2 값 사용
-#     # data_2 = request.form['comment_2']
-#     ########################## predict ##########################
-#     class_name_2=['N', 'S']
-#     MAX_LEN = 87
-
-#     token_text = tokenizer_2.tokenize(data_2)
-#     input_ids = [[tokenizer_2.convert_tokens_to_ids(tokens) for tokens in token_text]]
-#     input_ids = pad_sequences(input_ids, maxlen=MAX_LEN, dtype="long", truncating="post", padding="post")
-#     input_ids = torch.tensor(input_ids)
-    
-#     input_ids = input_ids.to(device)
-
-#     with torch.no_grad():
-#         output = model_2(input_ids)
-
-#     output = output[0]
-#     pred_2 = torch.argmax(output, 1)
-    
-#     predict_2 = class_name_2[pred_2]
-
-#     session['S&N'] = predict_2 # 추론 결과를 session에 value값으로 저장함
-#     # Mbti_pred['S&N'] = predict_2
-
-#     q2 = MBTI_result.query.filter_by(id=session['USER_ID']).first()
-#     # q2 = MBTI_result.query.filter(MBTI_result.id==session['USER_ID']).all()
-#     q2.sn = session['S&N']
-#     db.session.commit()
-
-#     print(session)
-
-#     return render_template('Classification.html')
-
-
 # T & F
 ###########################################################################
 @bp.route('/get_device_Mobile', methods=['GET', 'POST'])
@@ -347,48 +304,6 @@ def get_device_Mobile():
 def get_device_PC():
     
     return render_template('PC.html')
-
-# T & F 추론 작업
-# @bp.route('/question_3', methods=['GET','POST'])
-# def T_F_predict():
-#     ################ t&f 웹캠을 이용한 감정 분류
-#     # try:
-#     #     print(session)
-#     #     predict_3 = request.json
-#     #     print('receive data', predict_3)
-#     #     session['T&F'] = predict_3
-#     #     print(session)
-#     # except:
-#     #     pass
-    
-#     ################ t&f 얼굴 이미지 분류
-#     class_names = ['T', 'F']
-#     session['T&F'] = 'F' # 사용자가 이미지를 넣지 않는 경우를 대비해 임의적으로 SESSION 값을 지정함
-#     if request.method == 'POST':
-#         if 'file' not in request.files:
-#             flash('No file part')
-#             return redirect(request.url)
-#         file = request.files['file']
-
-#         if file.filename == '':
-#             flash('No file selected')
-#             return redirect(request.url)
-#         if file and allowed_file(file.filename):
-#             filename = secure_filename(file.filename)
-#             file_path = os.path.join(UPLOAD_FOLDER, filename)
-#             file.save(file_path) 
-
-#             # 얼굴 검출된 이미지 얻기
-#             data = detect_face(file_path)
-
-#             prediction = model_3.predict(data)
-#             index = np.argmax(prediction)
-#             class_name = class_names[index]
-#             print("Face Class:", class_name)
-#             session['T&F'] = class_name
-#             print(session)
-#     return render_template('test_4.html')
-
 
 @bp.route('/get_device_Mobile2', methods=['GET', 'POST'])
 def get_device_Mobile2():
@@ -428,7 +343,6 @@ def get_device_PC2():
     session['T&F'] = 'F'    # 사용자가 이미지를 넣지 않는 경우를 대비해 임의적으로 SESSION 값을 지정함
     predict_3 = session['T&F']
     # print(session['USER_ID'])
-    
     try:
         # predict_3 = request.json
         data = request.json
@@ -438,7 +352,6 @@ def get_device_PC2():
         q3.tf = data['predict']
         db.session.commit()
         # session['T&F'] = predict_3
-
     except:
         pass
 
