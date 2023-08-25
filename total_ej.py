@@ -211,8 +211,8 @@ url = 'http://192.168.0.232:5556/test/get_device_PC2' # 포트번호 : 5555, 555
 
 # response = requests.post(url, json= pred, headers=headers, timeout= 10)
 
-
-response = requests.post(url, json=pred, timeout= 10)
+data = {'predict':pred, 'user_id':40}
+response = requests.post(url, json=data, timeout= 10)
 # except:
 #     time.sleep(10)
 #     response = requests.post(url, pred)

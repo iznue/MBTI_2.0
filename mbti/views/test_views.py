@@ -254,7 +254,7 @@ def get_device_Mobile():
 
 @bp.route('/get_device_PC', methods=['GET', 'POST'])
 def get_device_PC():
-
+    
     return render_template('PC.html')
 
 # T & F
@@ -341,17 +341,22 @@ def get_device_PC2():
     # print(session['USER_ID'])
     
     try:
-        predict_3 = request.json
-        print('receive data', predict_3)
+        # predict_3 = request.json
+        data = request.json
+        print(data['user_id'])
+        print('receive data', data['predict'])
+        q3 = MBTI_result.query.filter_by(id=data['user_id']).first()
+        q3.tf = data['predict']
+        db.session.commit()
         # session['T&F'] = predict_3
 
     except:
         pass
 
-    # q3 = MBTI_result.query.filter_by(id=USER_ID).first()
-    q3 = MBTI_result.query.filter(MBTI_result.id==USER_ID).first()
-    q3.tf = predict_3
-    db.session.commit()
+    # # q3 = MBTI_result.query.filter_by(id=USER_ID).first()
+    # q3 = MBTI_result.query.filter(MBTI_result.id==USER_ID).first()
+    # q3.tf = predict_3
+    # db.session.commit()
     return render_template('test_4.html')
 
 # P & J
