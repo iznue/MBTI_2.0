@@ -172,10 +172,21 @@ def E_I_predict():
     print(USER_ID)
     
     print(session)
-    return render_template('test_2.html') # test_2.html에 추론 결과 전달
+    return render_template('Classification2.html') # test_2.html에 추론 결과 전달
 
 # S & N
 ###########################################################################
+@bp.route('/get_device_Mobile_test_2', methods=['GET', 'POST'])
+def get_device_Mobile_test_2():
+
+    return render_template('Mobile_test_2.html')
+
+
+@bp.route('/get_device_PC_test_2', methods=['GET', 'POST'])
+def get_device_PC_test_2():
+
+    return render_template('PC_test_2.html')
+
 # S & N 음성 입력 받기
 @bp.route('/question_2_audio', methods=['GET','POST'])
 def question_2_audio():
@@ -205,25 +216,28 @@ def question_2_audio():
         answer = transcription  # 실패 메시지를 answer로 저장
         print(answer)
 
-    return render_template('test_2.html')
+    return render_template('PC_test_2.html')
 
 
 # S & N 추론 작업
-@bp.route('/question_2', methods=['GET','POST'])
-def S_N_predict():
+# S & N 추론 작업
+@bp.route('/question_2_PC', methods=['GET', 'POST'])
+def question_2_PC():
+    print(session)
     data_2 = session['answer']
-    
+
+
     # 핸드폰의 경우 답변 입력을 받으므로 'comment_2 값 사용
     # data_2 = request.form['comment_2']
     ########################## predict ##########################
-    class_name_2=['N', 'S']
+    class_name_2 = ['N', 'S']
     MAX_LEN = 87
 
     token_text = tokenizer_2.tokenize(data_2)
     input_ids = [[tokenizer_2.convert_tokens_to_ids(tokens) for tokens in token_text]]
     input_ids = pad_sequences(input_ids, maxlen=MAX_LEN, dtype="long", truncating="post", padding="post")
     input_ids = torch.tensor(input_ids)
-    
+
     input_ids = input_ids.to(device)
 
     with torch.no_grad():
@@ -231,10 +245,10 @@ def S_N_predict():
 
     output = output[0]
     pred_2 = torch.argmax(output, 1)
-    
+
     predict_2 = class_name_2[pred_2]
 
-    session['S&N'] = predict_2 # 추론 결과를 session에 value값으로 저장함
+    session['S&N'] = predict_2  # 추론 결과를 session에 value값으로 저장함
     # Mbti_pred['S&N'] = predict_2
 
     q2 = MBTI_result.query.filter_by(id=session['USER_ID']).first()
@@ -246,6 +260,83 @@ def S_N_predict():
 
     return render_template('Classification.html')
 
+@bp.route('/question_2_Mobile', methods=['GET', 'POST'])
+def question_2_Mobile():
+    data_2 = request.form['comment_2']
+    session['S&N'] = 'S'
+
+    ########################## predict ##########################
+    class_name_2 = ['N', 'S']
+    MAX_LEN = 87
+
+    token_text = tokenizer_2.tokenize(data_2)
+    input_ids = [[tokenizer_2.convert_tokens_to_ids(tokens) for tokens in token_text]]
+    input_ids = pad_sequences(input_ids, maxlen=MAX_LEN, dtype="long", truncating="post", padding="post")
+    input_ids = torch.tensor(input_ids)
+
+    input_ids = input_ids.to(device)
+
+    with torch.no_grad():
+        output = model_2(input_ids)
+
+    output = output[0]
+    pred_2 = torch.argmax(output, 1)
+
+    predict_2 = class_name_2[pred_2]
+
+    session['S&N'] = predict_2  # 추론 결과를 session에 value값으로 저장함
+    # Mbti_pred['S&N'] = predict_2
+
+    q2 = MBTI_result.query.filter_by(id=session['USER_ID']).first()
+    # q2 = MBTI_result.query.filter(MBTI_result.id==session['USER_ID']).all()
+    q2.sn = session['S&N']
+    db.session.commit()
+
+    print(session)
+
+    return render_template('Classification.html')
+
+
+# @bp.route('/question_2', methods=['GET','POST'])
+# def S_N_predict():
+#     data_2 = session['answer']
+    
+#     # 핸드폰의 경우 답변 입력을 받으므로 'comment_2 값 사용
+#     # data_2 = request.form['comment_2']
+#     ########################## predict ##########################
+#     class_name_2=['N', 'S']
+#     MAX_LEN = 87
+
+#     token_text = tokenizer_2.tokenize(data_2)
+#     input_ids = [[tokenizer_2.convert_tokens_to_ids(tokens) for tokens in token_text]]
+#     input_ids = pad_sequences(input_ids, maxlen=MAX_LEN, dtype="long", truncating="post", padding="post")
+#     input_ids = torch.tensor(input_ids)
+    
+#     input_ids = input_ids.to(device)
+
+#     with torch.no_grad():
+#         output = model_2(input_ids)
+
+#     output = output[0]
+#     pred_2 = torch.argmax(output, 1)
+    
+#     predict_2 = class_name_2[pred_2]
+
+#     session['S&N'] = predict_2 # 추론 결과를 session에 value값으로 저장함
+#     # Mbti_pred['S&N'] = predict_2
+
+#     q2 = MBTI_result.query.filter_by(id=session['USER_ID']).first()
+#     # q2 = MBTI_result.query.filter(MBTI_result.id==session['USER_ID']).all()
+#     q2.sn = session['S&N']
+#     db.session.commit()
+
+#     print(session)
+
+#     return render_template('Classification.html')
+
+
+# T & F
+###########################################################################
 @bp.route('/get_device_Mobile', methods=['GET', 'POST'])
 def get_device_Mobile():
 
@@ -257,8 +348,6 @@ def get_device_PC():
     
     return render_template('PC.html')
 
-# T & F
-###########################################################################
 # T & F 추론 작업
 # @bp.route('/question_3', methods=['GET','POST'])
 # def T_F_predict():
